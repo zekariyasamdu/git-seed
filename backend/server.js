@@ -1,6 +1,6 @@
 import cors from 'cors'
 import mongoose from 'mongoose'
-import authRoutes from './routes/auth'
+import authRoutes from './routes/auth.js'
 import express from 'express'
 import dotenv from 'dotenv'
 dotenv.config();
@@ -19,3 +19,6 @@ mongoose.connect(process.env.MONGO_URI)
     });
   })
   .catch(err => console.log(err));
+
+
+ 

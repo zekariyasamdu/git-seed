@@ -1,4 +1,4 @@
-import User from '../models/User'
+import { User } from '../models/user.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import express from 'express'
@@ -29,4 +29,4 @@ router.post('/login', async (req, res) => {
   res.json({ token });
 });
 
-module.exports = router;
+export default router
