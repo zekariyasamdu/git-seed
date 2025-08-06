@@ -1,0 +1,11 @@
+{
+    "name": "encrption",
+    "type": "module",
+    "scripts": {
+        "main": "app.js"
+    },
+    "devDependencies": {
+        "@types/node": "^24.2.0",
+        "typescript": "^5.9.2"
+    }
+}
