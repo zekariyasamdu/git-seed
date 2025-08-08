@@ -11,7 +11,7 @@ file=$2
 key=$3
 
 if [ "$command" = "encrypt" ] ; then
-  node app.js "$command" "$file" "$key"
+  node main.js "$command" "$file" "$key"
   echo "encrypt successfully"
 elif  [ "$command" = "decrypt" ]; then
  node app.js "$command" "$file" "$key"

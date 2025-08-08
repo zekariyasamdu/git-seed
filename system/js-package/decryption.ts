@@ -1,40 +1,20 @@
 import fs from 'fs';
 import crypto from 'crypto'
-
+import { getKeyFromPassword } from './utils.js';
 
 const algorithm = 'aes-256-cbc';
 const ivLength = 16;
 
-// Convert password to 32-byte key using SHA-256
-function getKeyFromPassword(password) {
-  return crypto.createHash('sha256').update(password).digest();
-}
-
-// Encrypt a file
-function encryptFile(filename, password) {
-  const key = getKeyFromPassword(password);
-  const iv = crypto.randomBytes(ivLength);
-  const cipher = crypto.createCipheriv(algorithm, key, iv);
-
-  const input = fs.createReadStream(filename);
-  const output = fs.createWriteStream(filename + '.enc');
-
-  output.write(iv); // write IV to the beginning of the file
-
-  input.pipe(cipher).pipe(output);
-
-  output.on('finish', () => {
-    console.log(`[+] Encrypted: ${filename} -> ${filename}.enc`);
-  });
-}
-
 // Decrypt a file
-function decryptFile(filename, password) {
+export function decryptFile(filename: string | undefined, password: string | undefined) {
+  if (!filename || !password) {
+    throw new Error("Filename and password must be provided");
+  }
   const key = getKeyFromPassword(password);
   const input = fs.createReadStream(filename);
 
   let iv;
-  let decipher;
+  let decipher: crypto.Decipheriv;
   let started = false;
 
   const outputFilename = filename.replace(/\.enc$/, '');
@@ -69,13 +49,4 @@ function decryptFile(filename, password) {
       console.error('[-] Failed to decrypt.');
     }
   });
-}
-
-// --- CLI driver ---
-const args = process.argv.slice(2);
-const [command, file, key] = args;
-if (command === 'encrypt') {
-  encryptFile(file, key);
-} else if (command === 'decrypt') {
-  decryptFile(file, key);
 }
