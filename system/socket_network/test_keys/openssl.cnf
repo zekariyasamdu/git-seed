@@ -1,0 +1,56 @@
+[ req ]
+distinguished_name     = req_distinguished_name
+x509_extensions        = v3_ca
+prompt                 = no
+
+[ req_distinguished_name ]
+# Two-letter country code (e.g., US, CA, UK)
+C                      = US
+# State or province (e.g., California, New York)
+ST                     = California
+# City or locality (e.g., San Francisco)
+L                      = San Francisco
+# Organization name (e.g., Acme Inc.)
+O                      = My Custom Network
+# Organizational unit name (e.g., IT, Engineering)
+OU                     = Security Department
+# Common Name - This is the most important part for the CA
+# It should be descriptive, like a domain name or purpose.
+CN                     = My Private Certificate Authority
+
+[ v3_ca ]
+# Standard extensions for a Certificate Authority
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints       = critical, CA:true
+# Specifies the certificate's purpose: signing other certs
+keyUsage               = critical, digitalSignature, cRLSign, keyCertSign
+
+[ v3_server ]
+# Standard extensions for a server certificate
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints       = critical, CA:false
+keyUsage               = critical, digitalSignature, keyEncipherment
+# Tells browsers and clients this is a server certificate
+extendedKeyUsage       = serverAuth
+# This section is critical for hostname verification
+# You can add multiple DNS names or IP addresses
+subjectAltName         = @alt_names
+
+[ alt_names ]
+# DNS entry for the server (e.g., myapp.local)
+# DNS.1 = your-server.com
+# DNS.2 = another-domain.com
+# IP entry for the server (e.g., 127.0.0.1)
+IP.1 = 127.0.0.1
+
+
+[ v3_client ]
+# Standard extensions for a client certificate
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints       = critical, CA:false
+keyUsage               = critical, digitalSignature, keyEncipherment
+# Tells the server this is a client certificate
+extendedKeyUsage       = clientAuth
