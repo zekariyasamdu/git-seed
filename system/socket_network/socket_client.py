@@ -27,3 +27,5 @@ with socket.create_connection((HOST, PORT)) as sock:
                 f.write(data)
 
 print("File downloaded with verified SSL!")
+
+

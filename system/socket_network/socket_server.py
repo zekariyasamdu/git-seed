@@ -16,7 +16,8 @@ context.load_cert_chain(certfile="./test_keys/server_cert.pem", keyfile="./test_
 context.verify_mode = ssl.CERT_REQUIRED  # Require a client certificate
 context.load_verify_locations(cafile="./test_keys/ca_cert.pem") # CA that signed the client cert
 
-
+def decrypt(file, key):
+    return;
 
 # Function to handle each client connection
 def handle_client(conn, addr):
