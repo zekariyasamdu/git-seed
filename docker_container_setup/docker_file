@@ -1,0 +1,18 @@
+FROM ipfs/kubo:latest
+
+# Set environment variables for IPFS
+ENV IPFS_PATH=/data/ipfs
+
+# Copy swarm.key for private network
+COPY swarm.key /data/ipfs/swarm.key
+
+# Copy repo files
+COPY repo /repo
+
+# Copy start script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+EXPOSE 4001 5001 8080
+
+ENTRYPOINT ["/start.sh"]
