@@ -69,9 +69,3 @@ def generate_new_objects(old_sha, new_sha):
                 })
 
     return json.dumps(dag, indent=2)
-
-
-if __name__ == "__main__":
-    old_sha = "HEAD~2"   # two commits back
-    new_sha = "HEAD"
-    print(generate_new_objects(old_sha, new_sha))

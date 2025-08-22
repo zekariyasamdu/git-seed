@@ -1,4 +1,3 @@
-import json
 
 def write_in_json_file(data, filename="objects.json"):
     try:
