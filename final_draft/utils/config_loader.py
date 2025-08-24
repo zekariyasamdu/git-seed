@@ -1,54 +1,27 @@
 import os
-import configparser
-import argparse
-import os
 from cryptography.hazmat.primitives.asymmetric import x25519
 from cryptography.hazmat.primitives import serialization
 
-# ---------------------------
-# Argument parsing
-# ---------------------------
-parser = argparse.ArgumentParser(description="Load client or server keys and generate if missing")
-group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument("--client", action="store_true", help="Load client config")
-group.add_argument("--server", action="store_true", help="Load server config")
-args = parser.parse_args()
+#-----------------------------------
+# The following program is used to generate private and public keys if the user doesn't have any
+#-----------------------------------
 
-# Determine config file
-if args.client:
-    config_file = "client.config"
-elif args.server:
-    config_file = "server.config"
+"""
+Path were the keys live
+"""
+KEY_DIR = os.path.expanduser("~/.git_ipfs_keys/")
+IPFS_STATIC_SK = os.path.join(KEY_DIR, "ipfs_static.sk")
+IPFS_STATIC_PK = os.path.join(KEY_DIR, "ipfs_static.pk")
 
-# ---------------------------
-# Load config
-# ---------------------------
-config = configparser.ConfigParser()
-config.read(config_file)
-
-KEY_DIR = os.path.expanduser(config["KEYS"]["KEY_DIR"])
-RESPONDER_STATIC_SK = config["KEYS"].get("RESPONDER_STATIC_SK")
-RESPONDER_STATIC_PK = config["KEYS"].get("RESPONDER_STATIC_PK")
-INITIATOR_STATIC_SK = config["KEYS"].get("INITIATOR_STATIC_SK")
-INITIATOR_STATIC_PK = config["KEYS"].get("INITIATOR_STATIC_PK")
-
-if RESPONDER_STATIC_SK: RESPONDER_STATIC_SK = os.path.expanduser(RESPONDER_STATIC_SK)
-if RESPONDER_STATIC_PK: RESPONDER_STATIC_PK = os.path.expanduser(RESPONDER_STATIC_PK)
-if INITIATOR_STATIC_SK: INITIATOR_STATIC_SK = os.path.expanduser(INITIATOR_STATIC_SK)
-if INITIATOR_STATIC_PK: INITIATOR_STATIC_PK = os.path.expanduser(INITIATOR_STATIC_PK)
-
-# Ensure directory exists
-os.makedirs(KEY_DIR, exist_ok=True)
-
-# ---------------------------
-# Key generation
-# ---------------------------
+"""
+Generation of the keys
+"""
 def generate_keypair(sk_path, pk_path):
     """Generate a Noise X25519 keypair if missing."""
     if os.path.exists(sk_path) and os.path.exists(pk_path):
         return
 
-    # Generate private key
+    # Generate private key using X25519 elliptic curve used for Diffie–Hellman key exchange.
     private_key = x25519.X25519PrivateKey.generate()
     public_key = private_key.public_key()
 
@@ -74,19 +47,7 @@ def generate_keypair(sk_path, pk_path):
 
     print(f"Generated new keypair: {sk_path}, {pk_path}")
 
-# Generate missing keys if defined in config
-if RESPONDER_STATIC_SK and RESPONDER_STATIC_PK:
-    generate_keypair(RESPONDER_STATIC_SK, RESPONDER_STATIC_PK)
-
-if INITIATOR_STATIC_SK and INITIATOR_STATIC_PK:
-    generate_keypair(INITIATOR_STATIC_SK, INITIATOR_STATIC_PK)
-
-# ---------------------------
-# Info
-# ----------------------------
 if __name__ == "__main__":
+    os.makedirs(KEY_DIR, exist_ok=True)
     print("Key directory:", KEY_DIR)
-    if RESPONDER_STATIC_SK: print("Responder private key:", RESPONDER_STATIC_SK)
-    if RESPONDER_STATIC_PK: print("Responder public key:", RESPONDER_STATIC_PK)
-    if INITIATOR_STATIC_SK: print("Initiator private key:", INITIATOR_STATIC_SK)
-    if INITIATOR_STATIC_PK: print("Initiator public key:", INITIATOR_STATIC_PK)
+    generate_keypair(IPFS_STATIC_SK, IPFS_STATIC_PK)

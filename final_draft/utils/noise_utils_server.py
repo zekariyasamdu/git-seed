@@ -1,22 +1,51 @@
-# noise_utils_server.py
 import os
 import struct
-import configparser
 from typing import Tuple
 from noise.connection import NoiseConnection, Keypair
+from utils.config_loader import generate_keypair
 
 # ---------------------------
-# Config (server loads its own keys)
+# The folloing file is used as a collection of noise protocal helper funtions for the responder
 # ---------------------------
-KEY_DIR = os.path.expanduser("~/.git_ipfs_keys/server")
-RESPONDER_STATIC_SK = os.path.join(KEY_DIR, "responder_static.sk")
-RESPONDER_STATIC_PK = os.path.join(KEY_DIR, "responder_static.pk")
 
-# changed to XX so responder does not require initiator static PK pre-shared
+
+"""
+Path were the keys live
+"""
+
+KEY_DIR = os.path.expanduser("~/.git_ipfs_keys/")
+IPFS_STATIC_SK = os.path.join(KEY_DIR, "ipfs_static.sk")
+IPFS_STATIC_PK = os.path.join(KEY_DIR, "ipfs_static.pk")
+
+"""
+Configrations for the noise ptotocal
+"""
+
 NOISE_PATTERN = "XX"
 CIPHER = "ChaChaPoly"
 DH = "25519"
 HASH = "BLAKE2s"
+
+
+
+# ---------------------------
+# Key management
+# ---------------------------
+def ensure_key_dir():
+    os.makedirs(KEY_DIR, exist_ok=True)
+
+def read_binary(path: str) -> bytes:
+    with open(path, "rb") as f:
+        return f.read()
+
+def ensure_responder_keys() -> Tuple[bytes, bytes]:
+    ensure_key_dir()
+    if os.path.exists(IPFS_STATIC_SK) and os.path.exists(IPFS_STATIC_PK):
+        return read_binary(IPFS_STATIC_SK), read_binary(IPFS_STATIC_PK)
+
+    generate_keypair(IPFS_STATIC_SK, IPFS_STATIC_PK)
+    return ensure_responder_keys()
+
 
 # ---------------------------
 # Frame helpers (same as client)
@@ -40,39 +69,6 @@ def recv_frame(sock, timeout: float | None = None) -> bytes:
     header = recv_exact(sock, 4, timeout)
     (length,) = struct.unpack(">I", header)
     return recv_exact(sock, length, timeout) if length else b""
-
-# ---------------------------
-# Key management
-# ---------------------------
-def ensure_key_dir():
-    os.makedirs(KEY_DIR, exist_ok=True)
-
-def write_binary(path: str, data: bytes, mode=0o600):
-    with open(path, "wb") as f:
-        f.write(data)
-    try:
-        os.chmod(path, mode)
-    except Exception:
-        pass
-
-def read_binary(path: str) -> bytes:
-    with open(path, "rb") as f:
-        return f.read()
-
-def ensure_responder_keys() -> Tuple[bytes, bytes]:
-    ensure_key_dir()
-    if os.path.exists(RESPONDER_STATIC_SK) and os.path.exists(RESPONDER_STATIC_PK):
-        return read_binary(RESPONDER_STATIC_SK), read_binary(RESPONDER_STATIC_PK)
-
-    priv = os.urandom(32)
-    nc = NoiseConnection.from_name(f"Noise_{NOISE_PATTERN}_{DH}_{CIPHER}_{HASH}".encode())
-    nc.set_as_responder()
-    nc.set_keypair_from_private_bytes(Keypair.STATIC, priv)
-    pub = nc.get_public_key(Keypair.STATIC)
-
-    write_binary(RESPONDER_STATIC_SK, priv)
-    write_binary(RESPONDER_STATIC_PK, pub)
-    return priv, pub
 
 # ---------------------------
 # Noise handshake (responder)
