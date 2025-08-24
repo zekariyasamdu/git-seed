@@ -8,16 +8,15 @@ from noise.connection import NoiseConnection, Keypair
 # ---------------------------
 # Config (client loads its own keys)
 # ---------------------------
-config = configparser.ConfigParser()
-config.read("client.config")
 
-KEY_DIR = os.path.expanduser(config["KEYS"]["KEY_DIR"])
-INITIATOR_STATIC_SK = os.path.expanduser(config["KEYS"]["INITIATOR_STATIC_SK"])
-INITIATOR_STATIC_PK = os.path.expanduser(config["KEYS"]["INITIATOR_STATIC_PK"])
+KEY_DIR = os.path.expanduser("~/.git_ipfs_keys/client")
+INITIATOR_STATIC_SK = os.path.join(KEY_DIR, "initiator_static.sk")
+INITIATOR_STATIC_PK = os.path.join(KEY_DIR, "initiator_static.pk")
+
+# Ensure key directory exists
+os.makedirs(KEY_DIR, exist_ok=True)
 
 
-
-# use XX so initiator does NOT need responder static PK pre-shared
 NOISE_PATTERN = "XX"
 CIPHER = "ChaChaPoly"
 DH = "25519"

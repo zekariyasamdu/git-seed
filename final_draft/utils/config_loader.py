@@ -26,7 +26,6 @@ elif args.server:
 config = configparser.ConfigParser()
 config.read(config_file)
 
-# Expand paths
 KEY_DIR = os.path.expanduser(config["KEYS"]["KEY_DIR"])
 RESPONDER_STATIC_SK = config["KEYS"].get("RESPONDER_STATIC_SK")
 RESPONDER_STATIC_PK = config["KEYS"].get("RESPONDER_STATIC_PK")

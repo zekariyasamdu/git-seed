@@ -1,14 +1,14 @@
 # approve_response_secure.py
 import socket
 import os
-from noise_utils_client import (
+from utils.noise_utils_client import (
     noise_initiator_handshake,
     send_frame,
     recv_frame,
     ensure_initiator_keys,
 )
 import sys
-
+#  python3 -m gitlabs.approve_response
 
 # Set this to the pusher host that the container can reach (your host)
 PUSHER_HOST = os.getenv("PUSHER_HOST", "127.0.0.1")
@@ -63,5 +63,5 @@ if __name__ == "__main__":
     #     old, new = sys.argv[1], sys.argv[2]
     # else:
     #     # fallback for testing
-    old, new = "HEAD~2", "HEAD"
+    old, new = "HEAD~1", "HEAD"
     run_hook(old, new)

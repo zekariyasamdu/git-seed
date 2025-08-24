@@ -8,12 +8,9 @@ from noise.connection import NoiseConnection, Keypair
 # ---------------------------
 # Config (server loads its own keys)
 # ---------------------------
-config = configparser.ConfigParser()
-config.read("server.config")
-
-KEY_DIR = os.path.expanduser(config["KEYS"]["KEY_DIR"])
-RESPONDER_STATIC_SK = os.path.expanduser(config["KEYS"]["RESPONDER_STATIC_SK"])
-RESPONDER_STATIC_PK = os.path.expanduser(config["KEYS"]["RESPONDER_STATIC_PK"])
+KEY_DIR = os.path.expanduser("~/.git_ipfs_keys/server")
+RESPONDER_STATIC_SK = os.path.join(KEY_DIR, "responder_static.sk")
+RESPONDER_STATIC_PK = os.path.join(KEY_DIR, "responder_static.pk")
 
 # changed to XX so responder does not require initiator static PK pre-shared
 NOISE_PATTERN = "XX"
