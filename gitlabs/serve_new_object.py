@@ -8,6 +8,7 @@ from utils.noise_utils_server import (
     noise_responder_handshake,
     send_frame,
 )
+# to start: python3 -m gitlabs.serve_new_objects
 
 # OBJECTS_PATH = "/var/opt/gitlab/git-data/repositories/@hashed/6b/86/6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b.git"
 OBJECTS_PATH = "/home/zach/Documents/test_connections/objects.json"

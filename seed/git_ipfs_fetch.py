@@ -35,7 +35,7 @@ def fetch_refs():
 def write_in_json_file(data, filename="new_objects.json"):
     try:
         with open(filename, "a") as f:
-            f.write(data + "\n")  # append JSON per line
+            f.write(data + "\n")  
         print(f"Appended objects to {filename}")
     except Exception as e:
         print(f"Error writing to file: {e}")
@@ -46,16 +46,14 @@ def download_objects_json_socket(host, port):
     print(f"[*] Connecting to server {host}:{port} ...")
     data = b""
 
-    # load or generate initiator keys
     initiator_sk, initiator_pk = ensure_initiator_keys()
 
     try:
         with socket.create_connection((host, port), timeout=SOCKET_TIMEOUT) as sock:
-            # perform initiator handshake
+
             nc = noise_initiator_handshake(sock, initiator_sk, timeout=SOCKET_TIMEOUT)
             print("[+] Noise handshake finished (initiator)")
 
-            # receive encrypted payload
             enc_data = recv_frame(sock, timeout=SOCKET_TIMEOUT)
             data = nc.decrypt(enc_data)
             write_in_json_file(data.decode())

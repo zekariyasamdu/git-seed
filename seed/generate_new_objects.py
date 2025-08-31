@@ -22,13 +22,10 @@ Run ipfs command and return output as string.
 """
 def run_ipfs_command(args, input_data=None):
     try:
-        # Build base command
         cmd = ["ipfs"] + args
 
         if input_data is not None:
-            # IPFS reads from stdin using '-' (there is no --stdin option)
             cmd = cmd + ["-"]
-            # If input_data is bytes, pass as bytes and decode stdout afterwards
             if isinstance(input_data, bytes):
                 result = subprocess.run(
                     cmd,
@@ -77,7 +74,7 @@ import subprocess
 def generate_cid(sha: str) -> str:
     try:
         raw_compressed = read_git_object_compressed(sha)
-        # Write to temp file
+
         import tempfile
         import os
         with tempfile.NamedTemporaryFile(delete=False) as tmp:
@@ -110,10 +107,9 @@ Generate JSON for all commits between old_sha and new_sha (inclusive of new_sha)
 def generate_new_objects(old_sha, new_sha):
     dag = {"objects": []}
 
-    # List all commits in the push range, newest last
     commits = run_git_command(["rev-list", f"{old_sha}..{new_sha}"]).splitlines()
 
-    for commit_sha in reversed(commits):  # process in chronological order
+    for commit_sha in reversed(commits): 
         commit_info = run_git_command(["cat-file", "-p", commit_sha]).splitlines()
         tree_sha = None
         parents = []
@@ -131,7 +127,6 @@ def generate_new_objects(old_sha, new_sha):
                 message_lines.append(line)
         commit_message = "\n".join(message_lines).strip()
 
-        # Commit object
         folder, fname = split_sha(commit_sha)
         dag["objects"].append({
             "type": "commit",
@@ -143,7 +138,6 @@ def generate_new_objects(old_sha, new_sha):
             "parents": parents
         })
 
-        # Tree object
         folder, fname = split_sha(tree_sha)
         dag["objects"].append({
             "type": "tree",
@@ -153,7 +147,6 @@ def generate_new_objects(old_sha, new_sha):
             "file_name": fname
         })
 
-        # Blobs objects
         tree_entries = run_git_command(["ls-tree", "-r", tree_sha]).splitlines()
         for entry in tree_entries:
             parts = entry.split()

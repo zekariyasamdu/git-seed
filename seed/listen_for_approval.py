@@ -8,8 +8,10 @@ from utils.noise_utils_server import (
     recv_frame,
     send_frame,
 )
+
+import threading
 from .generate_new_objects import generate_new_objects
-# python3 -m seed.listen_for_approval
+# to start: python3 -m seed.listen_for_approval
 
 LISTEN_HOST = "0.0.0.0"
 LISTEN_PORT = 6003
@@ -24,7 +26,6 @@ def handle_connection(conn, addr):
         nc = noise_responder_handshake(conn, responder_sk, timeout=SOCKET_TIMEOUT)
         print("[+] Noise handshake finished (responder)")
 
-        # receive control message - USE decrypt() NOT read_message()
         enc_control = recv_frame(conn, timeout=SOCKET_TIMEOUT)
         if not enc_control:
             print("[!] No control frame received, closing")
@@ -33,7 +34,6 @@ def handle_connection(conn, addr):
         print(f"[+] Control: {control_plain}")
 
         if control_plain.strip() == "Approved":
-            # optional commit-range from client
             enc_range = recv_frame(conn, timeout=SOCKET_TIMEOUT)
             if enc_range:
                 try:
@@ -78,7 +78,8 @@ def serve():
 
         while True:
             conn, addr = s.accept()
-            handle_connection(conn, addr)
+            t = threading.Thread(target=handle_connection,daemon=True, args=(conn, addr))
+            t.start()
 
 if __name__ == "__main__":
     try:
