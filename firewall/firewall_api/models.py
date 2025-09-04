@@ -14,3 +14,10 @@ class AllowedIP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     repo_id = db.Column(db.Integer, db.ForeignKey("repos.id"), nullable=False)
     ip_address = db.Column(db.String(45), nullable=False)
+
+class AdminList(db.Model):
+    __tablename__ = "admin_list"
+
+    id = db.Column(db.Integer, primary_key=True)
+    admin_name = db.Column(db.String(255), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)

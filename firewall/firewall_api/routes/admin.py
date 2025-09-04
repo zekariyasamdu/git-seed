@@ -1,73 +1,104 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, jsonify, request
+from models import Repo, AllowedIP
 from __init__ import db
-# from dummy_data import Repo, AllowedIP
 
 admin_bp = Blueprint("admin", __name__)
 
-# ---------------- READ ----------------
-@admin_bp.route("/repos/<string:repo_name>/ips", methods=["GET"])
-def get_ips(repo_name):
-    repo = Repo.query.filter_by(name=repo_name).first()
-    if not repo:
-        abort(404, "Repo not found")
 
-    return jsonify([ip.ip_address for ip in repo.allowed_ips])
+@admin_bp.route("/repos", methods=["GET"])
+def get_repos():
+    repos = Repo.query.all()
+    repo_list = [{"id": repo.id, "name": repo.name} for repo in repos]
+    return jsonify({"repos": repo_list}), 200
 
-# ---------------- CREATE ----------------
-@admin_bp.route("/repos/<string:repo_name>/ips", methods=["POST"])
-def add_ip(repo_name):
+@admin_bp.route("/repos-with-ips", methods=["GET"])
+def get_repos_with_ips():
+    repos = Repo.query.all()
+    repo_list = []
+    for repo in repos:
+        repo_list.append({
+            "id": repo.id,
+            "name": repo.name,
+            "allowed_ips": [ip.ip_address for ip in repo.allowed_ips]
+        })
+    return jsonify({"repos": repo_list}), 200
+
+@admin_bp.route("/repos/<int:id>/ips", methods=["GET"])
+def get_ips(id):
+    ips = AllowedIP.query.filter_by(repo_id=id).all()
+    ip_list = [ip.ip_address for ip in ips]  
+    return jsonify({"repo_id": id, "allowed_ips": ip_list}), 200
+
+
+@admin_bp.route("/repos/<int:id>/ips", methods=["POST"])
+def add_ip(id):
     data = request.get_json()
-    ip_address = data.get("ip")
+    ip_address = data.get("ip_address")  
 
     if not ip_address:
-        abort(400, "IP address required")
+        return jsonify({"error": "IP address is required"}), 400
 
-    repo = Repo.query.filter_by(name=repo_name).first()
+    repo = Repo.query.get(id)
     if not repo:
-        repo = Repo(name=repo_name)
-        db.session.add(repo)
-        db.session.commit()
+        return jsonify({"error": "Repo not found"}), 404
 
-    new_ip = AllowedIP(repo_id=repo.id, ip_address=ip_address)
+    
+    new_ip = AllowedIP(ip_address=ip_address, repo_id=id)
     db.session.add(new_ip)
     db.session.commit()
 
-    return jsonify({"message": f"IP {ip_address} added to {repo_name}"}), 201
+    return jsonify({
+        "message": "IP added successfully",
+        "repo_id": id,
+        "ip": ip_address
+    }), 201
 
-# ---------------- UPDATE ----------------
-@admin_bp.route("/repos/<string:repo_name>/ips/<int:ip_id>", methods=["PUT"])
-def update_ip(repo_name, ip_id):
+
+@admin_bp.route("/repos/<int:id>/ips/<int:ip_id>", methods=["PUT"])
+def update_ip(id, ip_id):
     data = request.get_json()
-    new_ip = data.get("ip")
+    updated_ip = data.get("updated_ip")
 
-    if not new_ip:
-        abort(400, "New IP required")
+    if not updated_ip:
+        return jsonify({"error": "Updated IP required"}), 400
 
-    repo = Repo.query.filter_by(name=repo_name).first()
+    repo = Repo.query.get(id)
     if not repo:
-        abort(404, "Repo not found")
+        return jsonify({"error": "Repo not found"}), 404
 
-    ip_entry = AllowedIP.query.filter_by(id=ip_id, repo_id=repo.id).first()
+    ip_entry = AllowedIP.query.filter_by(id=ip_id, repo_id=id).first()
     if not ip_entry:
-        abort(404, "IP entry not found")
+        return jsonify({"error": "IP address not found"}), 404
 
-    ip_entry.ip_address = new_ip
+
+    ip_entry.ip_address = updated_ip
     db.session.commit()
 
-    return jsonify({"message": f"IP {ip_id} updated to {new_ip}"}), 200
+    return jsonify({
+        "message": "IP updated successfully",
+        "repo_id": id,
+        "ip_id": ip_id,
+        "new_address": updated_ip
+    }), 200
 
-# ---------------- DELETE ----------------
-@admin_bp.route("/repos/<string:repo_name>/ips/<int:ip_id>", methods=["DELETE"])
-def delete_ip(repo_name, ip_id):
-    repo = Repo.query.filter_by(name=repo_name).first()
+
+@admin_bp.route("/repos/<int:id>/ips/<int:ip_id>", methods=["DELETE"])
+def delete_ip(id, ip_id):
+    
+    repo = Repo.query.get(id)
     if not repo:
-        abort(404, "Repo not found")
+        return jsonify({"error": "Repo not found"}), 404
 
-    ip_entry = AllowedIP.query.filter_by(id=ip_id, repo_id=repo.id).first()
-    if not ip_entry:
-        abort(404, "IP entry not found")
+    ip_address = AllowedIP.query.filter_by(id=ip_id, repo_id=id).first()
+    if not ip_address:
+        return jsonify({"error": "IP address not found"}), 404
 
-    db.session.delete(ip_entry)
+    db.session.delete(ip_address)
     db.session.commit()
 
-    return jsonify({"message": f"IP {ip_id} deleted from {repo_name}"}), 200
+    return jsonify({
+        "message": "IP deleted successfully",
+        "repo_id": id,
+        "ip_id": ip_id,
+    }), 200
+
