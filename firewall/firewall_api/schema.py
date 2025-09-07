@@ -31,3 +31,14 @@ class CrudIpResponseSchema(Schema):
     message = fields.Str()
     repo_id = fields.Int(required=True)
     ip = fields.Str(required=True)
+
+#login 
+
+class LoginRequestSchema(Schema):
+    admin_name = fields.String(required=True)
+    password = fields.String(required=True)
+
+class LoginResponse(Schema):
+    access_token = fields.Str(required=True)
+    token_type = fields.Str(required=True)
+    user_id = fields.Str(required=True)

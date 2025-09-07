@@ -3,11 +3,12 @@ from models import Repo, AllowedIP
 from marshmallow import ValidationError
 from schema import ReposResponseSchema ,ReposWithIpResponseSchema, IpsResponseSchema, CrudIpRequestSchema, CrudIpResponseSchema
 from __init__ import db
-
+from flask_jwt_extended import jwt_required, get_jwt_identity
 admin_bp = Blueprint("admin", __name__)
-
+from routes.auth import login
 
 @admin_bp.route("/repos", methods=["GET"])
+@jwt_required()
 def get_repos():
     repos = Repo.query.all()
     schema = ReposResponseSchema();
@@ -15,6 +16,7 @@ def get_repos():
     return jsonify(response), 200
 
 @admin_bp.route("/repos-with-ips", methods=["GET"])
+@jwt_required()
 def get_repos_with_ips():
     repos = Repo.query.all()
     schema = ReposWithIpResponseSchema()
@@ -22,6 +24,7 @@ def get_repos_with_ips():
     return jsonify(response), 200
 
 @admin_bp.route("/repos/<int:id>/ips", methods=["GET"])
+@jwt_required()
 def get_ips(id):
     ips = AllowedIP.query.filter_by(repo_id=id).all()
     schema = IpsResponseSchema()
@@ -30,6 +33,7 @@ def get_ips(id):
 
 
 @admin_bp.route("/repos/<int:id>/ips", methods=["POST"])
+@jwt_required()
 def add_ip(id):
     data = request.get_json()
     request_schema = CrudIpRequestSchema()
@@ -57,6 +61,7 @@ def add_ip(id):
 
 
 @admin_bp.route("/repos/<int:id>/ips/<int:ip_id>", methods=["PUT"])
+@jwt_required()
 def update_ip(id, ip_id):
 
     data = request.get_json()
@@ -88,6 +93,7 @@ def update_ip(id, ip_id):
 
 
 @admin_bp.route("/repos/<int:id>/ips/<int:ip_id>", methods=["DELETE"])
+@jwt_required()
 def delete_ip(id, ip_id):
 
     response_schema = CrudIpResponseSchema()
@@ -103,9 +109,8 @@ def delete_ip(id, ip_id):
     db.session.delete(ip_entry)
     db.session.commit()
 
-    return jsonify(response_schema.load({
+    return jsonify(response_schema.dump({
         "message": "IP deleted successfully",
         "repo_id": id,
         "ip":  ip_entry.ip_address
     })), 200
-
