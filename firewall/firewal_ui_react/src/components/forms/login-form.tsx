@@ -9,21 +9,35 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useActionState } from "react"
-
-
+import { useAuth } from "@/hooks/use-auth"
+import { useActionState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 export default function LoginForm() {
     const [data, loginAction, pending] = useActionState(login, undefined)
+    const { setToken } = useAuth()
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        function fn() {
+            if (data?.success) {
+                setToken(data.success.access_token)
+                navigate("/", { replace: true });
+            }
+        }
+        fn()
+
+    }, [data, setToken, navigate])
 
     return (
         <div className="mt-0 flex flex-col items-center" >
             <img src="/src/assets/logo-1615753395.jpg" width={400} height={400} alt="" />
             <Card className="w-full max-w-sm ">
                 <form action={loginAction}>
-                    <CardHeader>
+                    <CardHeader >
 
-                        {data?.error?.adminName && (
-                            <Label className="text-red-500">{data.error.adminName}</Label>
+                        {data?.error && (
+                            <Label className="text-red-500 m-auto">{data.error as string}</Label>
                         )}
 
                     </CardHeader>
@@ -34,6 +48,7 @@ export default function LoginForm() {
                                 <Label htmlFor="email">username</Label>
                                 <Input
                                     id="adminname"
+                                    name="adminname"
                                     type="text"
                                     placeholder="root"
                                     required
@@ -41,7 +56,10 @@ export default function LoginForm() {
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="password">Password</Label>
-                                <Input id="password" type="password" required />
+                                <Input id="password"
+                                    type="password"
+                                    name="password"
+                                    required />
                             </div>
                         </div>
 
