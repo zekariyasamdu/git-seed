@@ -1,5 +1,5 @@
+import { credentialsSchema, loginResponseSchema } from "@/schema";
 import axios from "axios";
-import { credentialsSchema, loginResponseSchema } from "./schema";
 
 
 export async function login(prevState: unknown, formData: FormData) {

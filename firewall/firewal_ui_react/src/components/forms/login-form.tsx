@@ -1,5 +1,4 @@
 "use client"
-import { login } from "@/auth"
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -10,8 +9,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/hooks/use-auth"
+import { login } from "@/utils/auth"
 import { useActionState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { SuspenseImage } from "../suspense-image"
+
 export default function LoginForm() {
     const [data, loginAction, pending] = useActionState(login, undefined)
     const { setToken } = useAuth()
@@ -30,8 +32,14 @@ export default function LoginForm() {
     }, [data, setToken, navigate])
 
     return (
-        <div className="mt-0 flex flex-col items-center" >
-            <img src="/src/assets/logo-1615753395.jpg" width={400} height={400} alt="" />
+        <div className="mt-3 flex flex-col items-center gap-1.5" >
+            <SuspenseImage
+                src="/src/assets/logo-1615753395.jpg"
+                width={400}
+                height={400}
+                alt="Company Logo"
+                className="h-[400px] w-[400px]"
+            />
             <Card className="w-full max-w-sm ">
                 <form action={loginAction}>
                     <CardHeader >
