@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/hooks/use-auth"
-import { login } from "@/utils/auth"
+import { login } from "@/lib/auth"
 import { useActionState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { SuspenseImage } from "../suspense-image"

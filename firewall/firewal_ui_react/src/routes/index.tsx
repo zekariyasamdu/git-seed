@@ -3,10 +3,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { ProtectedRoute } from "./protectedRoute";
 import LoginPage from "@/pages/login-page";
-import DashboardLayout from "@/components/layout/dashboard-layout";
 import { WhiteListPage } from "@/pages/white-list-page";
 import { NotFoundPage } from "@/pages/not-found-page";
 const LazyDashboardPage = React.lazy(() => import('@/pages/dashboard-page'))
+const LazyDashboardLayout = React.lazy(() => import('@/components/layout/dashboard-layout'))
 
 
 const Routes = () => {
@@ -26,7 +26,7 @@ const Routes = () => {
             children: [
                 {
                     path: "/",
-                    element: <DashboardLayout />,
+                    element: <React.Suspense fallback={<>loading</>}> <LazyDashboardLayout /></React.Suspense>,
                     children: [
                         {
                             path: '/',

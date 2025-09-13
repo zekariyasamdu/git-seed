@@ -11,3 +11,8 @@ export const loginResponseSchema = z.object({
     token_type: z.literal("bearer"),
     user_id: z.string().or(z.number()),
 });
+
+export const fetchReposResponseSchema = z.object({
+    id: z.int(),
+    name: z.string()
+})
