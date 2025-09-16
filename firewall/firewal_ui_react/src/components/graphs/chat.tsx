@@ -1,5 +1,3 @@
-"use client"
-
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 import {
@@ -31,9 +29,11 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function Chart() {
+
+export function Chart({ ...props }: React.HTMLAttributes<HTMLDivElement>) {
     return (
-        <ChartContainer config={chartConfig} className="h-full w-1/3">
+
+        <ChartContainer config={chartConfig} {...props} >
             <BarChart accessibilityLayer data={chartData} >
                 <CartesianGrid vertical={false} />
                 <XAxis

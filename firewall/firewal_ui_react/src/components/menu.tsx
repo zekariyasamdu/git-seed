@@ -56,7 +56,7 @@ export function Menu() {
                 {/* Menu Item */}
                 <NavigationMenuItem>
                     <NavigationMenuTrigger>Filter</NavigationMenuTrigger>
-                    <NavigationMenuContent>
+                    <NavigationMenuContent className="z-20">
                         <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                             <li className="row-span-3">
                                 <NavigationMenuLink asChild>
@@ -88,7 +88,7 @@ export function Menu() {
                 {/* Menu Item */}
                 <NavigationMenuItem>
                     <NavigationMenuTrigger>Time period</NavigationMenuTrigger>
-                    <NavigationMenuContent>
+                    <NavigationMenuContent className="z-20">
                         <ul className="grid w-[400px] gap-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                             {components.map((component) => (
                                 <ListItem
