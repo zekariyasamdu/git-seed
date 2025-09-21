@@ -3,30 +3,29 @@ import { CategoryScale } from "chart.js";
 import { memo, useMemo } from "react";
 import { Pie } from "react-chartjs-2";
 import { Card } from "../ui/card";
+import type { Analytics } from "@/types/api";
+import { Skeleton } from "../ui/skeleton";
 
 Chart.register(CategoryScale);
 
-interface DataPoint {
-    id: number;
-    year: number;
-    userGain: number;
-    userLost: number;
-}
-
 type IPychartProps = {
-    Data: DataPoint[];
-    title: string
+    analytics: Analytics,
+    isLoading: boolean,
+    title: string,
+    lable: string
+
 } & React.HTMLAttributes<HTMLDivElement>
 
-function Pychart({ Data, title, ...props }: IPychartProps) {
+function Pychart({ analytics, isLoading, lable, title, ...props }: IPychartProps) {
+
 
     const chartData = useMemo(
         () => ({
-            labels: Data.map((data) => data.year.toString()),
+            labels: analytics.data.map((d) => d.repo_name.toString()),
             datasets: [
                 {
-                    label: "Users Gained",
-                    data: Data.map((data) => data.userGain),
+                    label: lable,
+                    data: analytics.data.map((d) => d.quantity),
                     backgroundColor: [
                         "rgba(75,192,192,1)",
                         "#ecf0f1",
@@ -39,11 +38,13 @@ function Pychart({ Data, title, ...props }: IPychartProps) {
                 },
             ],
         }),
-        [Data]
+        [analytics, lable]
     );
 
+    if (isLoading) return <Card className="p-0 "><Skeleton className="w-[300px] h-[322px] flex flex-col justify-center items-center"></Skeleton></Card>
+
     return (
-        <Card {...props}>
+        <Card {...props} className="w-fit h-fit flex flex-col justify-center items-center">
             <h2 style={{ textAlign: "center" }}>{title}</h2>
             <div className="relative w-fit h-56 flex items-center justify-center">
                 <Pie

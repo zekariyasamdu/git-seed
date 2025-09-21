@@ -8,33 +8,34 @@ import {
     ChartTooltipContent,
     type ChartConfig,
 } from "@/components/ui/chart"
-
-const chartData = [
-    { month: "January", desktop: 186, mobile: 80 },
-    { month: "February", desktop: 305, mobile: 200 },
-    { month: "March", desktop: 237, mobile: 120 },
-    { month: "April", desktop: 73, mobile: 190 },
-    { month: "May", desktop: 209, mobile: 130 },
-    { month: "June", desktop: 214, mobile: 140 },
-]
+import type { MonthlySuccessfulAndBlocked } from "@/types/api"
 
 const chartConfig = {
-    desktop: {
-        label: "Desktop",
+
+    blocked_requests: {
+        label: "Sccessful",
         color: "#2563eb",
     },
-    mobile: {
-        label: "Mobile",
+    successful_requests: {
+        label: "Blocked",
         color: "#60a5fa",
-    },
+    }
+
 } satisfies ChartConfig
 
+type ChartsProps = {
 
-export function Chart({ ...props }: React.HTMLAttributes<HTMLDivElement>) {
+    chartData: MonthlySuccessfulAndBlocked[]
+} & React.HTMLAttributes<HTMLDivElement>
+
+
+export function Chart({ chartData, ...props }: ChartsProps) {
     return (
 
         <ChartContainer config={chartConfig} {...props} >
+
             <BarChart accessibilityLayer data={chartData} >
+
                 <CartesianGrid vertical={false} />
                 <XAxis
                     dataKey="month"
@@ -45,9 +46,15 @@ export function Chart({ ...props }: React.HTMLAttributes<HTMLDivElement>) {
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <ChartLegend content={<ChartLegendContent />} />
-                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-                <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+                <Bar dataKey="successful_requests"
+                    fill="var(--color-desktop)"
+                    radius={4} />
+                <Bar dataKey="blocked_requests"
+                    fill="var(--color-mobile)"
+                    radius={4} />
+
             </BarChart>
+
         </ChartContainer>
     )
 }

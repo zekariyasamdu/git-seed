@@ -1,4 +1,5 @@
-import { credentialsSchema, loginResponseSchema } from "@/schema";
+import { loginResponseSchema } from "@/schema/api";
+import { credentialsSchema } from "@/schema/forms";
 import axios from "axios";
 
 

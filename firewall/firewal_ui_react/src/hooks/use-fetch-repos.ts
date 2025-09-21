@@ -1,4 +1,4 @@
-import { fetchReposResponseSchema } from "@/schema";
+import { fetchReposResponseSchema } from "@/schema/api";
 import type { fetchReposResponse } from "@/types/api";
 import axios from "axios";
 import { useEffect, useState } from "react";
